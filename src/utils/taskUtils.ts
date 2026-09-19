@@ -38,12 +38,18 @@ export function filterMissions(
 }
 
 export function computeStats(tasks: Mission[]): MissionStats {
+  let completed = 0;
+  let high = 0;
+  let medium = 0;
+  let low = 0;
+  for (const t of tasks) {
+    if (t.completed) completed++;
+    if (t.priority === 'high') high++;
+    else if (t.priority === 'medium') medium++;
+    else low++;
+  }
   const total = tasks.length;
-  const completed = tasks.filter((m) => m.completed).length;
   const pending = total - completed;
-  const high = tasks.filter((m) => m.priority === 'high').length;
-  const medium = tasks.filter((m) => m.priority === 'medium').length;
-  const low = tasks.filter((m) => m.priority === 'low').length;
   const progress = total === 0 ? 0 : Math.round((completed / total) * 100);
   return { total, completed, pending, high, medium, low, progress };
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Menu, X } from 'lucide-react';
 
 function CosmicClock() {
   const [now, setNow] = useState<Date>(new Date());
@@ -47,12 +48,19 @@ const NAV_ITEMS = [
 ];
 
 export default function NavBar({ active, onNav }: NavBarProps) {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleNav = (id: string) => {
+    onNav(id);
+    setMenuOpen(false);
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-40">
       <div className="glass-soft border-b border-white/5">
         <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between" aria-label="Main navigation">
           <button
-            onClick={() => onNav('hero')}
+            onClick={() => handleNav('hero')}
             className="flex items-center gap-2.5 group"
             aria-label="TaskNova home"
           >
@@ -70,7 +78,7 @@ export default function NavBar({ active, onNav }: NavBarProps) {
             {NAV_ITEMS.map((item) => (
               <button
                 key={item.id}
-                onClick={() => onNav(item.id)}
+                onClick={() => handleNav(item.id)}
                 className={`relative px-4 py-2 text-sm font-medium tracking-wide transition-colors rounded-lg ${
                   active === item.id
                     ? 'text-white'
@@ -87,8 +95,39 @@ export default function NavBar({ active, onNav }: NavBarProps) {
           </div>
 
           <CosmicClock />
+
+          <button
+            onClick={() => setMenuOpen((v) => !v)}
+            className="md:hidden p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+            aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-nav"
+          >
+            {menuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
         </nav>
       </div>
+
+      {menuOpen && (
+        <div id="mobile-nav" className="md:hidden glass-soft border-b border-white/10 fade-up-sm">
+          <nav className="mx-auto max-w-7xl px-4 py-3 flex flex-col gap-1" aria-label="Mobile navigation">
+            {NAV_ITEMS.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => handleNav(item.id)}
+                className={`text-left px-4 py-3 text-sm font-medium tracking-wide rounded-lg transition-colors ${
+                  active === item.id
+                    ? 'text-white bg-violet-500/15 border border-violet-400/30'
+                    : 'text-white/60 hover:text-white hover:bg-white/5'
+                }`}
+                aria-current={active === item.id ? 'page' : undefined}
+              >
+                {item.label}
+              </button>
+            ))}
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

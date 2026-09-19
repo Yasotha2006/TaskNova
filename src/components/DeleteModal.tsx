@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import type { Mission } from '@/types';
 
@@ -11,9 +11,11 @@ interface DeleteModalProps {
 export default function DeleteModal({ mission, onClose, onConfirm }: DeleteModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const keepButtonRef = useRef<HTMLButtonElement>(null);
+  const previouslyFocused = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!mission) return;
+    previouslyFocused.current = document.activeElement as HTMLElement;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
@@ -35,7 +37,10 @@ export default function DeleteModal({ mission, onClose, onConfirm }: DeleteModal
     };
     window.addEventListener('keydown', onKey);
     keepButtonRef.current?.focus();
-    return () => window.removeEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      previouslyFocused.current?.focus();
+    };
   }, [mission, onClose]);
 
   if (!mission) return null;
@@ -71,7 +76,7 @@ export default function DeleteModal({ mission, onClose, onConfirm }: DeleteModal
             Are you sure you want to remove this mission from your universe?
           </p>
           <p className="mt-2 text-sm text-white/40 italic break-words">
-            "{mission.title}"
+            &ldquo;{mission.title}&rdquo;
           </p>
 
           <div className="mt-6 flex gap-3">

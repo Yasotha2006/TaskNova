@@ -13,13 +13,17 @@ const PRIORITIES: Priority[] = ['high', 'medium', 'low'];
 export default function EditModal({ mission, onClose, onSave }: EditModalProps) {
   const [title, setTitle] = useState('');
   const [priority, setPriority] = useState<Priority>('medium');
+  const [error, setError] = useState('');
   const dialogRef = useRef<HTMLDivElement>(null);
-  const firstButtonRef = useRef<HTMLButtonElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const previouslyFocused = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (mission) {
       setTitle(mission.title);
       setPriority(mission.priority);
+      setError('');
+      previouslyFocused.current = document.activeElement as HTMLElement;
     }
   }, [mission]);
 
@@ -47,15 +51,22 @@ export default function EditModal({ mission, onClose, onSave }: EditModalProps) 
       }
     };
     window.addEventListener('keydown', onKey);
-    firstButtonRef.current?.focus();
-    return () => window.removeEventListener('keydown', onKey);
+    inputRef.current?.focus();
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      previouslyFocused.current?.focus();
+    };
   }, [mission, onClose]);
 
   if (!mission) return null;
 
   const handleSave = () => {
     const trimmed = title.trim();
-    if (!trimmed) return;
+    if (!trimmed) {
+      setError('Mission name is required.');
+      inputRef.current?.focus();
+      return;
+    }
     onSave(mission.id, trimmed, priority);
     onClose();
   };
@@ -89,17 +100,28 @@ export default function EditModal({ mission, onClose, onSave }: EditModalProps) 
             Mission Name
           </label>
           <input
+            ref={inputRef}
             id="edit-title"
             type="text"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => {
+              setTitle(e.target.value);
+              if (error) setError('');
+            }}
             className="cosmic-input w-full rounded-xl px-4 py-3 text-sm"
             maxLength={120}
             autoComplete="off"
+            aria-invalid={!!error}
+            aria-describedby={error ? 'edit-title-error' : undefined}
             onKeyDown={(e) => {
               if (e.key === 'Enter') handleSave();
             }}
           />
+          {error && (
+            <p id="edit-title-error" className="mt-2 text-xs text-red-300" role="alert">
+              {error}
+            </p>
+          )}
 
           <fieldset className="mt-4">
             <legend className="block text-xs font-body tracking-[0.16em] uppercase text-white/45 mb-2">
@@ -112,7 +134,6 @@ export default function EditModal({ mission, onClose, onSave }: EditModalProps) 
                 return (
                   <button
                     key={p}
-                    ref={selected ? firstButtonRef : undefined}
                     type="button"
                     onClick={() => setPriority(p)}
                     className={`px-3 py-2.5 rounded-xl border text-xs font-semibold tracking-wider transition-all ${
@@ -122,7 +143,7 @@ export default function EditModal({ mission, onClose, onSave }: EditModalProps) 
                     }`}
                     aria-pressed={selected}
                   >
-                    <span className="mr-1.5">{meta.symbol}</span>
+                    <span className="mr-1.5" aria-hidden>{meta.symbol}</span>
                     {meta.label}
                   </button>
                 );
