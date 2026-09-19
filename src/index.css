@@ -64,10 +64,6 @@
   font-family: 'Orbitron', system-ui, sans-serif;
   letter-spacing: 0.08em;
 }
-.font-display-tight {
-  font-family: 'Orbitron', system-ui, sans-serif;
-  letter-spacing: 0.04em;
-}
 .font-body {
   font-family: 'Outfit', system-ui, sans-serif;
 }
@@ -157,6 +153,11 @@
   100% { opacity: 1; }
 }
 
+.shooting-stars {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
 .shooting-star {
   position: absolute;
   width: 120px;
@@ -205,9 +206,6 @@
 }
 
 /* ============ Glows ============ */
-.glow-blue { box-shadow: 0 0 30px rgba(59, 130, 246, 0.35); }
-.glow-purple { box-shadow: 0 0 30px rgba(139, 92, 246, 0.35); }
-.glow-cyan { box-shadow: 0 0 30px rgba(34, 211, 238, 0.35); }
 .text-glow { text-shadow: 0 0 24px rgba(139, 92, 246, 0.55), 0 0 48px rgba(59, 130, 246, 0.35); }
 .text-glow-cyan { text-shadow: 0 0 20px rgba(34, 211, 238, 0.6); }
 
@@ -426,25 +424,15 @@
 }
 .pulse-soft { animation: pulse-soft 2.4s ease-in-out infinite; }
 
-@keyframes orbit-progress {
-  from { stroke-dashoffset: var(--from); }
-  to { stroke-dashoffset: var(--to); }
-}
-
 @keyframes float-y {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-8px); }
 }
 .float-y { animation: float-y 5s ease-in-out infinite; }
 
-.star-travel {
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 8px #fff, 0 0 16px rgba(52,211,153,0.8);
-  pointer-events: none;
+/* ============ Milestone ============ */
+.milestone-reached {
+  border-color: rgba(251, 191, 36, 0.2);
 }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -457,4 +445,8 @@
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+  .shooting-stars { display: none; }
+  .spin-slow, .spin-med, .spin-fast, .spin-rev { animation: none !important; }
+  .float-y { animation: none !important; }
+  .pulse-soft { animation: none !important; opacity: 0.8; }
 }

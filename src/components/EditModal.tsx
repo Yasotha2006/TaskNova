@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Mission, Priority } from '@/types';
 import { PRIORITY_META } from '@/types';
 
@@ -13,6 +13,8 @@ const PRIORITIES: Priority[] = ['high', 'medium', 'low'];
 export default function EditModal({ mission, onClose, onSave }: EditModalProps) {
   const [title, setTitle] = useState('');
   const [priority, setPriority] = useState<Priority>('medium');
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const firstButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (mission) {
@@ -22,10 +24,30 @@ export default function EditModal({ mission, onClose, onSave }: EditModalProps) 
   }, [mission]);
 
   useEffect(() => {
+    if (!mission) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+      if (e.key === 'Tab' && dialogRef.current) {
+        const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+          'button, input, [tabindex]:not([tabindex="-1"])',
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     };
-    if (mission) window.addEventListener('keydown', onKey);
+    window.addEventListener('keydown', onKey);
+    firstButtonRef.current?.focus();
     return () => window.removeEventListener('keydown', onKey);
   }, [mission, onClose]);
 
@@ -47,6 +69,7 @@ export default function EditModal({ mission, onClose, onSave }: EditModalProps) 
       aria-labelledby="edit-modal-title"
     >
       <div
+        ref={dialogRef}
         className="modal-panel glass rounded-2xl p-6 sm:p-7 w-full max-w-md relative overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
@@ -62,7 +85,6 @@ export default function EditModal({ mission, onClose, onSave }: EditModalProps) 
           </h2>
           <p className="text-xs text-white/40 mb-5">Adjust mission parameters</p>
 
-          {/* Title */}
           <label htmlFor="edit-title" className="block text-xs font-body tracking-[0.16em] uppercase text-white/45 mb-2">
             Mission Name
           </label>
@@ -73,41 +95,41 @@ export default function EditModal({ mission, onClose, onSave }: EditModalProps) 
             onChange={(e) => setTitle(e.target.value)}
             className="cosmic-input w-full rounded-xl px-4 py-3 text-sm"
             maxLength={120}
-            autoFocus
             autoComplete="off"
             onKeyDown={(e) => {
               if (e.key === 'Enter') handleSave();
             }}
           />
 
-          {/* Priority */}
-          <label className="block text-xs font-body tracking-[0.16em] uppercase text-white/45 mb-2 mt-4">
-            Mission Priority
-          </label>
-          <div className="grid grid-cols-3 gap-2.5">
-            {PRIORITIES.map((p) => {
-              const meta = PRIORITY_META[p];
-              const selected = priority === p;
-              return (
-                <button
-                  key={p}
-                  type="button"
-                  onClick={() => setPriority(p)}
-                  className={`px-3 py-2.5 rounded-xl border text-xs font-semibold tracking-wider transition-all ${
-                    selected
-                      ? `${meta.border} ${meta.color} bg-white/[0.03]`
-                      : 'border-white/10 text-white/50 hover:text-white/80 hover:border-white/20'
-                  }`}
-                  aria-pressed={selected}
-                >
-                  <span className="mr-1.5">{meta.symbol}</span>
-                  {meta.label}
-                </button>
-              );
-            })}
-          </div>
+          <fieldset className="mt-4">
+            <legend className="block text-xs font-body tracking-[0.16em] uppercase text-white/45 mb-2">
+              Mission Priority
+            </legend>
+            <div className="grid grid-cols-3 gap-2.5">
+              {PRIORITIES.map((p) => {
+                const meta = PRIORITY_META[p];
+                const selected = priority === p;
+                return (
+                  <button
+                    key={p}
+                    ref={selected ? firstButtonRef : undefined}
+                    type="button"
+                    onClick={() => setPriority(p)}
+                    className={`px-3 py-2.5 rounded-xl border text-xs font-semibold tracking-wider transition-all ${
+                      selected
+                        ? `${meta.border} ${meta.color} bg-white/[0.03]`
+                        : 'border-white/10 text-white/50 hover:text-white/80 hover:border-white/20'
+                    }`}
+                    aria-pressed={selected}
+                  >
+                    <span className="mr-1.5">{meta.symbol}</span>
+                    {meta.label}
+                  </button>
+                );
+              })}
+            </div>
+          </fieldset>
 
-          {/* Buttons */}
           <div className="mt-6 flex gap-3">
             <button
               onClick={onClose}

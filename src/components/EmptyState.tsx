@@ -10,14 +10,14 @@ export default function EmptyState({ variant, onLaunch, onClear }: EmptyStatePro
   if (variant === 'no-results') {
     return (
       <div className="glass rounded-2xl py-16 px-6 text-center fade-up-sm">
-        <div className="mx-auto mb-6 h-14 w-14 flex items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-300">
+        <div className="mx-auto mb-6 h-14 w-14 flex items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-300" aria-hidden>
           <SearchX size={26} />
         </div>
         <h3 className="font-display text-xl font-bold tracking-wider text-white">
           MISSION NOT FOUND
         </h3>
         <p className="mt-3 text-sm text-white/50 max-w-sm mx-auto">
-          Your search didn't locate a mission in this universe.
+          Try changing your search or filters.
         </p>
         {onClear && (
           <button
@@ -33,7 +33,6 @@ export default function EmptyState({ variant, onLaunch, onClear }: EmptyStatePro
 
   return (
     <div className="glass rounded-2xl py-20 px-6 text-center fade-up-sm relative overflow-hidden">
-      {/* stars */}
       <div className="absolute inset-0 opacity-30" aria-hidden>
         <div className="absolute top-1/4 left-1/4 h-1 w-1 rounded-full bg-white pulse-soft" />
         <div className="absolute top-1/3 right-1/3 h-1 w-1 rounded-full bg-white pulse-soft" style={{ animationDelay: '0.5s' }} />
@@ -43,7 +42,7 @@ export default function EmptyState({ variant, onLaunch, onClear }: EmptyStatePro
       </div>
 
       <div className="relative">
-        <div className="mx-auto mb-5 h-12 w-12 flex items-center justify-center text-violet-300 text-2xl float-y">
+        <div className="mx-auto mb-5 h-12 w-12 flex items-center justify-center text-violet-300 text-2xl float-y" aria-hidden>
           ✦
         </div>
         <h3 className="font-display text-xl sm:text-2xl font-bold tracking-wider text-white">

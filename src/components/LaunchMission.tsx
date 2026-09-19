@@ -5,19 +5,17 @@ import { PRIORITY_META } from '@/types';
 
 interface LaunchMissionProps {
   onLaunch: (title: string, priority: Priority) => void;
-  compact?: boolean;
 }
 
 const PRIORITIES: Priority[] = ['high', 'medium', 'low'];
 
-export default function LaunchMission({ onLaunch, compact = false }: LaunchMissionProps) {
+export default function LaunchMission({ onLaunch }: LaunchMissionProps) {
   const [title, setTitle] = useState('');
   const [priority, setPriority] = useState<Priority>('medium');
   const [burst, setBurst] = useState(false);
+  const [error, setError] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
-  const formRef = useRef<HTMLFormElement>(null);
 
-  // Expose focus to parent via custom event
   useEffect(() => {
     const handler = () => inputRef.current?.focus();
     window.addEventListener('tasknova:focus-launch', handler);
@@ -28,24 +26,23 @@ export default function LaunchMission({ onLaunch, compact = false }: LaunchMissi
     e.preventDefault();
     const trimmed = title.trim();
     if (!trimmed) {
+      setError('Mission name is required to launch.');
       inputRef.current?.focus();
       return;
     }
+    setError('');
     onLaunch(trimmed, priority);
     setTitle('');
     setPriority('medium');
-    // particle burst
     setBurst(true);
     setTimeout(() => setBurst(false), 700);
   };
 
   return (
     <form
-      ref={formRef}
       onSubmit={handleSubmit}
-      className={`glass rounded-2xl p-5 sm:p-6 relative overflow-hidden ${compact ? '' : 'fade-up'}`}
+      className="glass rounded-2xl p-5 sm:p-6 relative overflow-hidden fade-up"
     >
-      {/* glow accent */}
       <div
         className="absolute -top-16 -right-16 h-40 w-40 rounded-full blur-3xl opacity-30"
         style={{ background: 'rgba(139,92,246,0.6)' }}
@@ -62,27 +59,35 @@ export default function LaunchMission({ onLaunch, compact = false }: LaunchMissi
           </h2>
         </div>
 
-        {/* Title input */}
-        <label htmlFor="mission-title" className="sr-only">
-          Mission name
+        <label htmlFor="mission-title" className="block text-xs font-body tracking-[0.16em] uppercase text-white/45 mb-2">
+          Mission Name
         </label>
         <input
           ref={inputRef}
           id="mission-title"
           type="text"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => {
+            setTitle(e.target.value);
+            if (error) setError('');
+          }}
           placeholder="What mission are you preparing for?"
           className="cosmic-input w-full rounded-xl px-4 py-3 text-sm sm:text-base"
           maxLength={120}
           autoComplete="off"
+          aria-invalid={!!error}
+          aria-describedby={error ? 'mission-title-error' : undefined}
         />
+        {error && (
+          <p id="mission-title-error" className="mt-2 text-xs text-red-300" role="alert">
+            {error}
+          </p>
+        )}
 
-        {/* Priority */}
-        <div className="mt-4">
-          <span className="block text-xs font-body tracking-[0.16em] uppercase text-white/45 mb-2.5">
+        <fieldset className="mt-4">
+          <legend className="block text-xs font-body tracking-[0.16em] uppercase text-white/45 mb-2.5">
             Priority
-          </span>
+          </legend>
           <div className="grid grid-cols-3 gap-2.5">
             {PRIORITIES.map((p) => {
               const meta = PRIORITY_META[p];
@@ -99,15 +104,14 @@ export default function LaunchMission({ onLaunch, compact = false }: LaunchMissi
                   }`}
                   aria-pressed={selected}
                 >
-                  <span className="mr-1.5">{meta.symbol}</span>
+                  <span className="mr-1.5" aria-hidden>{meta.symbol}</span>
                   {meta.label}
                 </button>
               );
             })}
           </div>
-        </div>
+        </fieldset>
 
-        {/* Submit */}
         <button
           type="submit"
           className="btn-primary mt-5 w-full px-6 py-3.5 rounded-xl text-white font-semibold tracking-wide flex items-center justify-center gap-2.5 text-sm sm:text-base"
@@ -117,7 +121,6 @@ export default function LaunchMission({ onLaunch, compact = false }: LaunchMissi
         </button>
       </div>
 
-      {/* Particle burst */}
       {burst && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden>
           {Array.from({ length: 10 }).map((_, i) => (

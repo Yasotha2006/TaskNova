@@ -20,7 +20,7 @@ function CosmicClock() {
   });
 
   return (
-    <div className="hidden md:flex items-center gap-3 text-xs font-body">
+    <div className="hidden lg:flex items-center gap-3 text-xs font-body">
       <div className="flex items-center gap-2">
         <span className="relative flex h-2 w-2">
           <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 pulse-soft" />
@@ -28,7 +28,7 @@ function CosmicClock() {
         </span>
         <span className="text-emerald-300/90 font-medium tracking-wider uppercase">Stable</span>
       </div>
-      <span className="text-white/20">|</span>
+      <span className="text-white/20" aria-hidden>|</span>
       <span className="text-white/60 tabular-nums">{date}</span>
       <span className="text-cyan-300/90 tabular-nums font-medium">{time}</span>
     </div>
@@ -50,14 +50,13 @@ export default function NavBar({ active, onNav }: NavBarProps) {
   return (
     <header className="fixed top-0 left-0 right-0 z-40">
       <div className="glass-soft border-b border-white/5">
-        <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          {/* Logo */}
+        <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between" aria-label="Main navigation">
           <button
             onClick={() => onNav('hero')}
             className="flex items-center gap-2.5 group"
             aria-label="TaskNova home"
           >
-            <span className="relative flex h-8 w-8 items-center justify-center">
+            <span className="relative flex h-8 w-8 items-center justify-center" aria-hidden>
               <span className="absolute inset-0 rounded-full border border-violet-400/40 spin-med" />
               <span className="absolute -inset-1 rounded-full border border-cyan-400/20 spin-rev" />
               <span className="h-3 w-3 rounded-full bg-gradient-to-br from-blue-400 to-violet-500 shadow-[0_0_14px_rgba(139,92,246,0.8)]" />
@@ -67,7 +66,6 @@ export default function NavBar({ active, onNav }: NavBarProps) {
             </span>
           </button>
 
-          {/* Nav links */}
           <div className="hidden md:flex items-center gap-1">
             {NAV_ITEMS.map((item) => (
               <button
@@ -78,16 +76,16 @@ export default function NavBar({ active, onNav }: NavBarProps) {
                     ? 'text-white'
                     : 'text-white/55 hover:text-white/90'
                 }`}
+                aria-current={active === item.id ? 'page' : undefined}
               >
                 {item.label}
                 {active === item.id && (
-                  <span className="absolute -bottom-px left-1/2 -translate-x-1/2 h-px w-2/3 bg-gradient-to-r from-transparent via-violet-400 to-transparent shadow-[0_0_8px_rgba(139,92,246,0.8)]" />
+                  <span className="absolute -bottom-px left-1/2 -translate-x-1/2 h-px w-2/3 bg-gradient-to-r from-transparent via-violet-400 to-transparent shadow-[0_0_8px_rgba(139,92,246,0.8)]" aria-hidden />
                 )}
               </button>
             ))}
           </div>
 
-          {/* Cosmic clock + status */}
           <CosmicClock />
         </nav>
       </div>

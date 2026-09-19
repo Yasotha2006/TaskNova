@@ -60,10 +60,10 @@ export const PRIORITY_META: Record<Priority, {
 };
 
 export const PROGRESS_MESSAGES: { min: number; max: number; text: string }[] = [
-  { min: 0, max: 0, text: 'Your universe is waiting for its first mission.' },
+  { min: 0, max: 0, text: 'Universe awaiting its first mission.' },
   { min: 1, max: 30, text: 'Your journey has begun.' },
   { min: 31, max: 70, text: 'Your universe is expanding.' },
-  { min: 71, max: 99, text: "You're approaching mission completion." },
+  { min: 71, max: 99, text: 'Mission completion approaching.' },
   { min: 100, max: 100, text: 'Universe fully synchronized.' },
 ];
 

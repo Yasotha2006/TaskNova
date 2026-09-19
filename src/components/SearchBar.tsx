@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Search, X } from 'lucide-react';
 
 interface SearchBarProps {
@@ -7,12 +6,9 @@ interface SearchBarProps {
 }
 
 export default function SearchBar({ value, onChange }: SearchBarProps) {
-  const [focused, setFocused] = useState(false);
-  useEffect(() => {}, [value]);
-
   return (
-    <div className={`relative transition-all ${focused ? 'scale-[1.01]' : ''}`}>
-      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-violet-300/70 pointer-events-none">
+    <div className="relative">
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-violet-300/70 pointer-events-none" aria-hidden>
         <Search size={18} />
       </div>
       <label htmlFor="mission-search" className="sr-only">
@@ -23,12 +19,14 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
         placeholder="Search the universe of your missions..."
         className="cosmic-input w-full rounded-xl pl-11 pr-10 py-3 text-sm"
         autoComplete="off"
+        aria-describedby="search-help"
       />
+      <span id="search-help" className="sr-only">
+        Type to filter missions by title. Results update instantly.
+      </span>
       {value && (
         <button
           onClick={() => onChange('')}
@@ -37,14 +35,6 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
         >
           <X size={16} />
         </button>
-      )}
-      {/* focus glow */}
-      {focused && (
-        <div
-          className="absolute inset-0 rounded-xl pointer-events-none"
-          style={{ boxShadow: '0 0 0 1px rgba(139,92,246,0.5), 0 0 24px rgba(139,92,246,0.2)' }}
-          aria-hidden
-        />
       )}
     </div>
   );

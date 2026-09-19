@@ -7,7 +7,8 @@ interface StatCardProps {
   label: string;
   value: number;
   delay?: string;
-  accent: string;
+  accentColor: string;
+  accentBg: string;
   symbol: string;
 }
 
@@ -32,31 +33,31 @@ function useCountUp(target: number, duration = 900) {
   return val;
 }
 
-function StatCard({ icon, label, value, delay = '', accent, symbol }: StatCardProps) {
+function StatCard({ icon, label, value, delay = '', accentColor, accentBg, symbol }: StatCardProps) {
   const display = useCountUp(value);
   return (
     <div className={`glass rounded-2xl p-5 sm:p-6 relative overflow-hidden fade-up-sm ${delay}`}>
-      {/* glow accent */}
       <div
         className="absolute -top-12 -right-12 h-32 w-32 rounded-full blur-3xl opacity-40"
-        style={{ background: accent }}
+        style={{ background: accentBg }}
         aria-hidden
       />
       <div className="relative flex items-start justify-between">
         <div>
           <div className="flex items-center gap-2 text-xs font-body tracking-[0.18em] uppercase text-white/50">
-            <span className="text-base" style={{ color: accent.replace('0.', '1.').replace(/,[\d.]+\)/, ',0.9)') }}>
+            <span className="text-base" style={{ color: accentColor }} aria-hidden>
               {symbol}
             </span>
             {label}
           </div>
-          <div className="mt-3 font-display text-3xl sm:text-4xl font-bold text-white tabular-nums">
+          <div className="mt-3 font-display text-3xl sm:text-4xl font-bold text-white tabular-nums" aria-live="polite">
             {display}
           </div>
         </div>
         <div
           className="flex h-10 w-10 items-center justify-center rounded-xl"
-          style={{ background: `${accent}25`, color: accent.replace('0.', '1.').replace(/,[\d.]+\)/, ',0.9)') }}
+          style={{ background: `${accentColor}25`, color: accentColor }}
+          aria-hidden
         >
           {icon}
         </div>
@@ -76,8 +77,8 @@ export default function Stats({ stats }: StatsProps) {
         icon={<Sparkles size={18} />}
         label="Total Missions"
         value={stats.total}
-        delay=""
-        accent="rgba(139,92,246,0.5)"
+        accentColor="#a78bfa"
+        accentBg="rgba(139,92,246,0.5)"
         symbol="✦"
       />
       <StatCard
@@ -85,7 +86,8 @@ export default function Stats({ stats }: StatsProps) {
         label="Completed"
         value={stats.completed}
         delay="delay-1"
-        accent="rgba(52,211,153,0.5)"
+        accentColor="#34d399"
+        accentBg="rgba(52,211,153,0.5)"
         symbol="◉"
       />
       <StatCard
@@ -93,7 +95,8 @@ export default function Stats({ stats }: StatsProps) {
         label="Pending"
         value={stats.pending}
         delay="delay-2"
-        accent="rgba(34,211,238,0.5)"
+        accentColor="#22d3ee"
+        accentBg="rgba(34,211,238,0.5)"
         symbol="◌"
       />
     </div>

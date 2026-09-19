@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import type { Mission } from '@/types';
 
@@ -9,11 +9,32 @@ interface DeleteModalProps {
 }
 
 export default function DeleteModal({ mission, onClose, onConfirm }: DeleteModalProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const keepButtonRef = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
+    if (!mission) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+      if (e.key === 'Tab' && dialogRef.current) {
+        const focusable = dialogRef.current.querySelectorAll<HTMLElement>('button');
+        if (focusable.length < 2) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     };
-    if (mission) window.addEventListener('keydown', onKey);
+    window.addEventListener('keydown', onKey);
+    keepButtonRef.current?.focus();
     return () => window.removeEventListener('keydown', onKey);
   }, [mission, onClose]);
 
@@ -28,6 +49,7 @@ export default function DeleteModal({ mission, onClose, onConfirm }: DeleteModal
       aria-labelledby="delete-modal-title"
     >
       <div
+        ref={dialogRef}
         className="modal-panel glass rounded-2xl p-6 sm:p-7 w-full max-w-md relative overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
@@ -54,6 +76,7 @@ export default function DeleteModal({ mission, onClose, onConfirm }: DeleteModal
 
           <div className="mt-6 flex gap-3">
             <button
+              ref={keepButtonRef}
               onClick={onClose}
               className="btn-ghost flex-1 px-5 py-3 rounded-xl text-white/80 font-medium text-sm tracking-wide"
             >
